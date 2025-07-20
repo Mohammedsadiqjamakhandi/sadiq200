@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Stock Viewer</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    h1 { color: #2c3e50; }
+    #data { font-size: 2em; color: green; }
+  </style>
+</head>
+<body>
+  <h1>📈 Live Stock Price: RELIANCE</h1>
+  <div id="data">Waiting for data...</div>
+
+  <script>
+    const socket = new WebSocket("ws://localhost:8765");
+    const display = document.getElementById("data");
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      display.innerText = `₹${data.price} at ${data.time}`;
+    };
+
+    socket.onerror = () => {
+      display.innerText = "❌ Connection error";
+    };
+  </script>
+</body>
+</html>

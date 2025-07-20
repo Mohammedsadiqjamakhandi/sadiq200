@@ -1,0 +1,12 @@
+import pandas as pd
+
+top200 = pd.read_csv("nse_200_symbols.csv")
+top200["symbol_no_eq"] = top200["symbol"].str.replace("-EQ", "")
+
+all_instr = pd.read_csv("all_nse_instruments.csv")
+
+filtered = all_instr[all_instr["symbol"].isin(top200["symbol_no_eq"])]
+
+filtered["symbol"] = filtered["symbol"] + "-EQ"
+filtered[["symbol", "token"]].to_csv("nse_200_with_tokens.csv", index=False)
+print("Filtered top 200 tokens saved to nse_200_with_tokens.csv")

@@ -1,0 +1,10 @@
+setup.py
+smartapi/__init__.py
+smartapi/smartConnect.py
+smartapi.egg-info/PKG-INFO
+smartapi.egg-info/SOURCES.txt
+smartapi.egg-info/dependency_links.txt
+smartapi.egg-info/requires.txt
+smartapi.egg-info/top_level.txt
+smartapi/websocket/__init__.py
+smartapi/websocket/smartWebSocketV2.py

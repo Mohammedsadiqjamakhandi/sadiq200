@@ -1,0 +1,60 @@
+import pandas as pd
+import time
+from SmartApi.smartConnect import SmartConnect
+from dotenv import load_dotenv
+import os
+import pyotp
+import requests
+import datetime
+
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
+CLIENT_CODE = os.getenv("CLIENT_CODE")
+PASSWORD = os.getenv("PASSWORD")
+TOTP_SECRET = os.getenv("TOTP_SECRET")
+
+TELEGRAM_TOKEN = "YOUR_TELEGRAM_TOKEN"
+CHAT_ID = "YOUR_CHAT_ID"
+
+def generate_totp():
+    return pyotp.TOTP(TOTP_SECRET).now()
+
+def send_telegram(message):
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+    payload = {"chat_id": CHAT_ID, "text": message}
+    try:
+        requests.post(url, data=payload)
+    except Exception as e:
+        print("Telegram send failed:", e)
+
+# Your Bollinger Band functions here (calculate_bbands, update_candles, check_signal)...
+
+# Login
+print("🚀 Logging in...")
+obj = SmartConnect(api_key=API_KEY)
+data = obj.generateSession(CLIENT_CODE, PASSWORD, generate_totp())
+print("✅ Logged in successfully.")
+
+# Load filtered top 200 stocks with tokens
+df_tokens = pd.read_csv("nse_200_with_tokens.csv")
+symbols = df_tokens["symbol"].tolist()
+tokens = df_tokens["token"].astype(str).tolist()
+symbol_token_map = dict(zip(symbols, tokens))
+print(f"📡 Tracking {len(symbols)} stocks...")
+
+# Your main loop logic: poll LTP, update candles, check signals, send telegram alerts
+
+# Example polling loop:
+while True:
+    for symbol, token in symbol_token_map.items():
+        try:
+            ltp_data = obj.ltpData("NSE", symbol, token)
+            ltp = float(ltp_data["data"]["ltp"])
+            print(f"{symbol} LTP: {ltp}")
+            # update_candles(symbol, ltp)
+            # check_signal(symbol)
+        except Exception as e:
+            print(f"Error fetching {symbol}: {e}")
+        time.sleep(0.1)
+    print("Waiting for next candle...\n")
+    time.sleep(60)
